@@ -8,7 +8,7 @@ const RegionData = () => {
   const fetchData = async () => {
     try {
       // Use axios to make the API request
-      const response = await axios.get(`/api/data`, {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/data`, {
         params: { region }  // Pass region as a query parameter
       });
       
