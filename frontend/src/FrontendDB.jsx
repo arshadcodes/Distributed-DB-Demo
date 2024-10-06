@@ -1,61 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';  // Import axios
 
 const RegionData = () => {
-  const [region, setRegion] = useState("India"); // Default to 'India'
+  const [region, setRegion] = useState('Canada');
   const [data, setData] = useState([]);
-  const [hasFetched, setHasFetched] = useState(false); // Track if data is fetched
 
-  // Function to simulate fetching random data
-  const fetchData = () => {
-    const randomData = Array.from({ length: 5 }, (_, i) => ({
-      name: `Item ${i + 1} from ${region} - ${Math.floor(Math.random() * 100)}`,
-    }));
-    setData(randomData);
-    setHasFetched(true); // Set to true when data is fetched
+  const fetchData = async () => {
+    try {
+      // Use axios to make the API request
+      const response = await axios.get(`/api/data`, {
+        params: { region }  // Pass region as a query parameter
+      });
+      
+      // Ensure response data is an array before setting it
+      const result = Array.isArray(response.data) ? response.data : [];
+      setData(result);
+      console.log(result);
+      
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   };
 
+  useEffect(() => {
+    fetchData();
+  }, [region]);
+
   return (
-    <div className="container mx-auto p-8">
-      {/* Dropdown and Button */}
-      <div className="flex items-center justify-center mb-10">
-        <label
-          htmlFor="region"
-          className="text-lg font-semibold text-gray-700 mr-4"
-        >
-          Select Region:
-        </label>
+    <div className="container mx-auto p-4">
+      <div className="mb-4">
+        <label htmlFor="region" className="block text-lg font-semibold">Select Region:</label>
         <select
           id="region"
-          className="custom-select" // Apply custom class
+          className="p-2 border rounded"
           value={region}
           onChange={(e) => setRegion(e.target.value)}
         >
-          <option value="India">India</option> {/* Value and label updated */}
-          <option value="Europe">Europe</option> {/* Value and label updated */}
+          <option value="India">India</option>
+          <option value="Europe">Eu</option>
         </select>
-        <button
-          className="custom-button" // Apply custom class
-          onClick={fetchData}
-        >
-          Fetch Data
-        </button>
       </div>
 
-      {/* Display Data only if fetched */}
-      {hasFetched && (
-        <div className="text-center bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-3xl font-extrabold text-gray-800 mb-6">
-            Data from {region} Database
-          </h2>
-          <ul className="list-disc pl-6 text-left text-gray-700">
-            {data.map((item, index) => (
-              <li key={index} className="mb-2">
-                {item.name}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <div className="data-table">
+        <h2 className="text-2xl font-bold">Data from {region} Database</h2>
+        <ul className="list-disc pl-5">
+          {/* Check if data is an array before mapping */}
+          {data.length > 0 ? (
+            data.map((item, index) => (
+              <li key={index}>{item.name}</li>
+            ))
+          ) : (
+            <p>No data available for {region}</p>
+          )}
+        </ul>
+      </div>
     </div>
   );
 };
